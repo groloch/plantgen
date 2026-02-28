@@ -22,6 +22,12 @@ def sample_timestep(
         device: torch.device | str,
         dtype: torch.dtype
     ) -> torch.Tensor:
+    """
+    Utility function to sample timesteps for the forward diffusion process.
+
+    Using a logit-normal distribution instead of uniform yields much better results as described in
+    https://arxiv.org/pdf/2403.03206
+    """
     if distribution == 'uniform':
         return torch.rand(batch_size, 1, 1, 1, device=device, dtype=dtype)
     elif distribution == 'logit_normal':
@@ -30,6 +36,11 @@ def sample_timestep(
     else:
         raise ValueError(f'Unknown timestep distribution: {distribution}')
 
+def train_flowmatching_interface(config: dict):
+    if config['data']['precomputed_latents']:
+        train_flowmatching_precomp(config)
+    else:
+        train_flowmatching(config)
 
 def train_flowmatching(config: dict):
     print('Loading configs...')
@@ -252,63 +263,6 @@ def train_one_epoch(
 def validate_one_epoch():
     pass
 
-def profiling_run(
-        model,
-        vae,
-        tokenizer,
-        text_encoder,
-        loss_fn,
-        train_dataloader,
-        optimizer,
-        scheduler,
-        device,
-        training_config,
-        train_logger):
-    print('Warming up trainloop...')
-    train_one_epoch(
-        epoch=0,
-        model=model,
-        vae=vae,
-        tokenizer=tokenizer,
-        text_encoder=text_encoder,
-        loss_fn=loss_fn,
-        train_dataloader=train_dataloader,
-        optimizer=optimizer,
-        device=device,
-        grad_clip=training_config.grad_clip,
-        logger=train_logger,
-        scheduler=scheduler,
-        log_every=training_config.log_every,
-        max_steps=10
-    ) # Warmup
-    print('Profiling trainloop...')
-    activities = [ProfilerActivity.CPU, ProfilerActivity.CUDA]
-    with profile(
-            activities=activities, with_stack=True,
-            experimental_config=torch._C._profiler._ExperimentalConfig(verbose=True)
-    ) as prof:
-        with record_function("trainloop"):
-            train_one_epoch(
-                epoch=0,
-                model=model,
-                vae=vae,
-                tokenizer=tokenizer,
-                text_encoder=text_encoder,
-                loss_fn=loss_fn,
-                train_dataloader=train_dataloader,
-                optimizer=optimizer,
-                device=device,
-                grad_clip=training_config.grad_clip,
-                logger=train_logger,
-                scheduler=scheduler,
-                log_every=training_config.log_every,
-                max_steps=10
-            )
-    prof.export_chrome_trace(f"{training_config.logdir}/flowmatching_train_profile.json")
-    prof.export_stacks(f"{training_config.logdir}/profiler_stacks.txt", "self_cuda_time_total")
-    print(prof.key_averages(group_by_stack_n=10).table(sort_by="cpu_time_total", row_limit=20))
-
-
 def train_flowmatching_precomp(config: dict):
     print('Loading configs...')
     model_config = DiTConfig(**config['model'])
@@ -496,9 +450,58 @@ def train_one_epoch_precomp(
 def validate_one_epoch_precomp():
     pass
 
-
-def train_flowmatching_interface(config: dict):
-    if config['data']['precomputed_latents']:
-        train_flowmatching_precomp(config)
-    else:
-        train_flowmatching(config)
+def profiling_run(
+        model,
+        vae,
+        tokenizer,
+        text_encoder,
+        loss_fn,
+        train_dataloader,
+        optimizer,
+        scheduler,
+        device,
+        training_config,
+        train_logger):
+    print('Warming up trainloop...')
+    train_one_epoch(
+        epoch=0,
+        model=model,
+        vae=vae,
+        tokenizer=tokenizer,
+        text_encoder=text_encoder,
+        loss_fn=loss_fn,
+        train_dataloader=train_dataloader,
+        optimizer=optimizer,
+        device=device,
+        grad_clip=training_config.grad_clip,
+        logger=train_logger,
+        scheduler=scheduler,
+        log_every=training_config.log_every,
+        max_steps=10
+    ) # Warmup
+    print('Profiling trainloop...')
+    activities = [ProfilerActivity.CPU, ProfilerActivity.CUDA]
+    with profile(
+            activities=activities, with_stack=True,
+            experimental_config=torch._C._profiler._ExperimentalConfig(verbose=True)
+    ) as prof:
+        with record_function("trainloop"):
+            train_one_epoch(
+                epoch=0,
+                model=model,
+                vae=vae,
+                tokenizer=tokenizer,
+                text_encoder=text_encoder,
+                loss_fn=loss_fn,
+                train_dataloader=train_dataloader,
+                optimizer=optimizer,
+                device=device,
+                grad_clip=training_config.grad_clip,
+                logger=train_logger,
+                scheduler=scheduler,
+                log_every=training_config.log_every,
+                max_steps=10
+            )
+    prof.export_chrome_trace(f"{training_config.logdir}/flowmatching_train_profile.json")
+    prof.export_stacks(f"{training_config.logdir}/profiler_stacks.txt", "self_cuda_time_total")
+    print(prof.key_averages(group_by_stack_n=10).table(sort_by="cpu_time_total", row_limit=20))
