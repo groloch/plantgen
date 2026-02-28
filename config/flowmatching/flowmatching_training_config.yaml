@@ -31,6 +31,7 @@ model:
   text_embed_dim: 768
   patch_size: 8
   sine_encoding_frequency: 10000.0
+  num_classes: 1081
 vae:
   in_channels: 3
   latent_dim: 16
