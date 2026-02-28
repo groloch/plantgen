@@ -31,6 +31,8 @@ if __name__ == '__main__':
             from .train_vae import train_vae
             train_vae(config)
         case 'vae_gen':
+            # To get there, change the type in the logged config file to 'vae_gen' and run the same command as for training.
+            # This is a bit hacky, but it allows us to reuse the same config for training and generation
             from .scripts.vae_gen import generate_and_vizualize, reconstruct_and_vizualize, vizualize_interpolation
             # generate_and_vizualize(config)
             reconstruct_and_vizualize(config)
@@ -39,6 +41,8 @@ if __name__ == '__main__':
             from .train_flowmatching import train_flowmatching_interface
             train_flowmatching_interface(config)
         case 'flowmatching_demo':
+            # To get there, change the type in the logged config file to 'flowmatching_demo' and run the same command as for training.
+            # This is a bit hacky, but it allows us to reuse the same config for training and generation
             from .scripts.demo import run_app
             run_app(config)
         case _:
