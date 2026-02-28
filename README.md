@@ -54,7 +54,4 @@ Make sure to adjust the config according to where you saved the latents.
 
 The default provided configs are set to the settings used for the final models training.
 
-Finally, to run the demo, use:
-```bash
-python -m src.plantgen config/demo/demo_config.yaml
-```
+To access the local demo (and vae script for generation), change the type in the logged config file to 'flowmatching_demo' (or 'vae_gen' for the vae script) and run the same command as for training. This is a bit hacky, but it allows to reuse the same config for training and generation.
