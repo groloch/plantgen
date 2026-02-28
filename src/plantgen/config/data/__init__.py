@@ -1,0 +1,1 @@
+from .plantnet_data_config import PlantNetDataConfig, PlantNetTTIDataConfig
