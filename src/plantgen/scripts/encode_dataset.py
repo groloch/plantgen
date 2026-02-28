@@ -62,6 +62,8 @@ def encode_dataset(config: dict, save_path: str):
     for i, (inputs, _) in enumerate(tqdm(train_loader, desc='Encoding images')):
         inputs = inputs.to(device, dtype=torch.float16)
 
+        mu: torch.Tensor
+
         mu, _, _ = model.encode(inputs)
         b = mu.shape[0]
 
