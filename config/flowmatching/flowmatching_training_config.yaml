@@ -1,0 +1,51 @@
+type: flowmatching
+training:
+  learning_rate: 3e-4
+  warmup_steps: 500
+  weight_decay: 0.01
+  num_epochs: 5
+  grad_clip: 1.0
+  logdir: "logs/flowmatching_training_r184_embdgemma"
+  save_every: 1
+  log_every: 10
+  vae_ckpt_path: "logs/vae_training_r184/convvae_3.pth"
+  text_encoder: "google/embeddinggemma-300m"
+  profile: false
+  gradient_accumulation_steps: 16
+  timestep_distribution: "logit_normal"
+data:
+  image_size: 128
+  num_classes: 1081
+  batch_size: 16
+  num_workers: 8
+  annotations_path: "data/plantnet_captions.csv"
+  similarity_threshold: 0.
+  precomputed_latents: false
+model:
+  model_type: mmdit
+  latent_dim: 16
+  latent_size: 16
+  hidden_dim: 512
+  n_layers: 16
+  n_heads: 8
+  text_embed_dim: 768
+  patch_size: 8
+  sine_encoding_frequency: 10000.0
+vae:
+  in_channels: 3
+  latent_dim: 16
+  depths:
+    - 3
+    - 5
+    - 7
+    - 3
+  dims:
+    - 48
+    - 96
+    - 192
+    - 384
+  ln_eps: 1e-6
+  iaf: false
+mlflow:
+  experiment_name: "FlowMatching"
+  tracking_uri: "file:./mlruns"
