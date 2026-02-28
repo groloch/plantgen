@@ -13,6 +13,9 @@ from ..config.data import PlantNetDataConfig, PlantNetTTIDataConfig
 
 
 class PlantNetDataset(Dataset):
+    """
+    Dataset wrapper with different augmentation modes for the PlantNet300K dataset.
+    """
     def __init__(self, dataset, image_size, augmentation_mode):
         super().__init__()
         self.dataset = dataset
@@ -72,6 +75,10 @@ class PlantNetDataset(Dataset):
 
 
 class PlantNetTTIDataset(Dataset):
+    """
+    Text-to-Image dataset wrapper for the PlantNet300K dataset.
+    Uses pre-generated captions and similarity scores to filter out low-quality annotations.
+    """
     def __init__(self, dataset, annotations, image_size, threshold):
         super().__init__()
 
@@ -106,6 +113,11 @@ class PlantNetTTIDataset(Dataset):
 
 
 class PlantNetPackedTTIDataset(Dataset):
+    """
+    Text-to-Image dataset wrapper for the PlantNet300K dataset.
+    Uses pre-computed VAE latents, pre-generated captions and similarity scores to filter out
+    low-quality annotations.
+    """
     def __init__(
             self,
             dataset,
