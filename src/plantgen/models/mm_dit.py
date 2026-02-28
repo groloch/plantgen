@@ -132,6 +132,13 @@ class MMDiTBlock(nn.Module):
 
 
 class MMDiT(DiTModel):
+    """
+    MM-DiT (MultiModal Diffusion Transformer) implementation similar to the one introduced 
+    by StableDiffusion3 (https://arxiv.org/pdf/2403.03206)
+
+    Main difference is that we don't combine the pooled text embeddings with the time embeddings
+    for the y vector, but only use the time embeddings as we've had better results with this approach.
+    """
     def __init__(self, config: MMDiTConfig):
         super().__init__()
 

@@ -162,6 +162,10 @@ class CrossDITBlock(nn.Module):
 
 
 class CrossDIT(DiTModel):
+    """
+    Diffusion transformer (https://arxiv.org/abs/2212.09748) with cross-attention between latent tokens and
+    conditioning.
+    """
     def __init__(self, config: CrossDITConfig):
         super().__init__()
 

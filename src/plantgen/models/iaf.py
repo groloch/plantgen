@@ -6,6 +6,7 @@ from .conv import ConvNextBlock, ChannelFirstLayerNorm
 
 
 class IAFSelfAttention(nn.Module):
+
     def __init__(self, latent_dim: int, ln_eps: float):
         super().__init__()
 
@@ -89,6 +90,11 @@ class IAFBlock(nn.Module):
 
 
 class IAFModel(nn.Module):
+    """
+    Simple autoregressive model (transformer encoder-decoder-like architecture) to use in the Inverse 
+    Autoregressive Flow (IAF) framework for diffusion models, as described in:
+    https://arxiv.org/abs/1606.04934
+    """
     def __init__(
             self,
             latent_dim: int,

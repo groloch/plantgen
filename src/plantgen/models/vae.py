@@ -8,6 +8,12 @@ from ..config.models import ConvVAEConfig
 
 
 class ConvVAE(nn.Module):
+    """
+    Convolutional VAE, with optional IAF module (https://arxiv.org/abs/1606.04934) for improved 
+    expressivity of the latent distribution.
+
+    Each stage of the encoder and of the decoder consists of ConvNext blocks (https://arxiv.org/abs/2201.03545).
+    """
     def __init__(self, config: ConvVAEConfig):
         super().__init__()
 
@@ -78,7 +84,7 @@ class ConvVAE(nn.Module):
 
         mu = self.mu_proj(x)
         log_var = self.logvar_proj(x)
-        h = self.h_proj(x)
+        h = self.h_proj(x) # used for IAF only as global conditioning for each IAF step
 
         return mu, log_var, h
 
@@ -92,13 +98,6 @@ class ConvVAE(nn.Module):
         return x
 
     def forward(self, x):
-        """
-        Args:
-            x (torch.Tensor): An input tensor of shape BxCx64x64
-
-        Returns:
-            _type_: _description_
-        """
         mu, log_var, h = self.encode(x)
         z, eps = self.reparameterize(mu, log_var)
 
@@ -122,14 +121,8 @@ class ConvVAE(nn.Module):
 
     @torch.no_grad()
     def generate(self, batch_size=1, device='cuda'):
-        """Generate new images from random latent vectors.
-
-        Args:
-            batch_size (int): Number of images to generate
-            device (str): Device to generate images on
-
-        Returns:
-            torch.Tensor: Generated images of shape (batch_size, channels, height, width)
+        """
+        Generate new images from random latent vectors.
         """
         latent_shape = (self.latent_dim, self.latent_image_size, self.latent_image_size)
         z = torch.randn(batch_size, *latent_shape, device=device)

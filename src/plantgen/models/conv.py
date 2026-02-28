@@ -8,6 +8,10 @@ class ConvBlock(nn.Module):
 
 
 class StandardConv(ConvBlock):
+    """
+    Simple convolutional block with a convolution layer, and optional batchnorm and activation fuction
+    """
+
     def __init__(
             self,
             in_channels,
@@ -36,6 +40,11 @@ class StandardConv(ConvBlock):
 
 
 class DepthwiseSeparableConv(ConvBlock):
+    """
+    Depthwise separable convolutional block with a convolution layer, and optional batchnorm and activation fuction
+    https://arxiv.org/abs/1704.04861
+    """
+
     def __init__(
             self,
             in_channels,
@@ -70,6 +79,11 @@ class DepthwiseSeparableConv(ConvBlock):
 
 
 class ResnetBlock(ConvBlock):
+    """
+    Residual convolutional block
+    https://arxiv.org/abs/1512.03385
+    """
+
     def __init__(
             self,
             block: nn.Module,
@@ -86,6 +100,10 @@ class ResnetBlock(ConvBlock):
 
 
 class DownsampleBlock(ConvBlock):
+    """
+    Simple downsampling block with a maxpooling layer, and optional batchnorm and activation fuction
+    """
+
     def __init__(
             self,
             block: nn.Module,
@@ -111,6 +129,9 @@ class DownsampleBlock(ConvBlock):
 
 
 class UpsampleBlock(ConvBlock):
+    """
+    Simple upsampling block with a bilinear upsampling layer, and optional batchnorm and activation fuction
+    """
     def __init__(
             self,
             block: nn.Module,
@@ -136,6 +157,10 @@ class UpsampleBlock(ConvBlock):
 
 
 class ChannelFirstLayerNorm(nn.Module):
+    """
+    Wrapper of torch's LayerNorm that operates on channel-first data (images).
+    """
+
     def __init__(self, num_channels, eps):
         super().__init__()
         self.ln = nn.LayerNorm(num_channels, eps=eps)
@@ -148,6 +173,11 @@ class ChannelFirstLayerNorm(nn.Module):
 
 
 class ConvNextBlock(nn.Module):
+    """
+    ConvNext block as described in:
+    https://arxiv.org/abs/2201.03545
+
+    """
     def __init__(self, dim, eps=1e-6):
         super().__init__()
 
@@ -171,6 +201,10 @@ class ConvNextBlock(nn.Module):
 
 
 class ConvNextEncoder(nn.Module):
+    """
+    Encoder for an autoencoder based on ConvNext blocks (https://arxiv.org/abs/2201.03545), with downsampling 
+    layers (strided convolutions) between stages.
+    """
     def __init__(
             self,
             in_channels: int,
@@ -211,6 +245,10 @@ class ConvNextEncoder(nn.Module):
 
 
 class ConvNextDecoder(nn.Module):
+    """
+    Decoder for an autoencoder based on ConvNext blocks (https://arxiv.org/abs/2201.03545), with 
+    upsampling layers (transposed convolutions) between stages.
+    """
     def __init__(
             self,
             latent_dim: int,
