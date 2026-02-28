@@ -35,9 +35,6 @@ if __name__ == '__main__':
             # generate_and_vizualize(config)
             reconstruct_and_vizualize(config)
             # vizualize_interpolation(config)
-        case 'classifier':
-            from .train_classifier import train_classifier
-            train_classifier(config)
         case 'flowmatching':
             from .train_flowmatching import train_flowmatching_interface
             train_flowmatching_interface(config)
