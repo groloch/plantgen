@@ -131,7 +131,7 @@ class MMDiTBlock(nn.Module):
         return x, c
 
 
-class MMDiT(nn.Module):
+class MMDiT(DiTModel):
     def __init__(self, config: MMDiTConfig):
         super().__init__()
 
