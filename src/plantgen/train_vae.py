@@ -77,6 +77,8 @@ def train_vae(config: dict):
     model.to(device)
     model.to(torch.bfloat16)
 
+    # Compilation is currently disabled as it seems incompatible with IAF
+
     # print('Model compilation enabled')
     # model.compile(mode='max-autotune')
 
