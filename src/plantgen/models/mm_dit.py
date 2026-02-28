@@ -230,39 +230,3 @@ class MMDiT(DiTModel):
         x = x.view(B, W, H, C).permute(0, 3, 1, 2)
 
         return x
-
-
-if __name__ == "__main__":
-    from ..config.models.dit_config import MMDiTConfig
-    from ..utils import model_parameters
-
-    config = MMDiTConfig(
-        latent_dim = 16,
-        latent_size = 64,
-        hidden_dim = 128,
-        n_heads = 8,
-        n_layers = 10,
-        text_embed_dim = 768,
-        patch_size=8,
-        sine_encoding_frequency=10000.0
-    )
-    model = MMDiT(config)
-
-    params, _ = model_parameters(model)
-    print(f'{params:,} parameters')
-
-    x = torch.randn(4, 16, 8, 8)
-    timestep = torch.rand(4, 1, 1, 1)
-
-    from transformers import AutoTokenizer, AutoModel
-    text_encoder = AutoModel.from_pretrained('google/embeddinggemma-300m')
-    tokenizer = AutoTokenizer.from_pretrained('google/embeddinggemma-300m')
-    sentences = ["A photo of a cat that is eating a cake.", "A photo of a dog."]*2
-
-    with torch.no_grad():
-        inputs = tokenizer(sentences, return_tensors="pt", padding=True, truncation=True)
-    embed = text_encoder(**inputs).last_hidden_state
-    attn_mask = inputs['attention_mask']
-
-    out = model(x, timestep, embed, attn_mask=attn_mask)
-    print(out.shape)
