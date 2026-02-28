@@ -4,6 +4,9 @@ from torchvision.models import resnet18, ResNet
 
 
 class LogCoshLoss(nn.Module):
+    """
+    Smooth approximation of MAE (L1) loss
+    """
     def __init__(self, a=2.0):
         super().__init__()
         self.a = a
@@ -34,12 +37,15 @@ class VAELoss(nn.Module):
         kl_loss = 0.5 * torch.mean(-1 - log_var + mu.pow(2) + log_var.exp())
         total_loss += (self.kl_loss_weight * kl_loss)
         return total_loss, recon_loss, perceptive_loss, kl_loss
-    
+
 
 class IAFLoss(nn.Module):
+    """
+    IAF KL-Divergence loss (https://arxiv.org/abs/1606.04934)
+    """
     def __init__(self):
         super().__init__()
-        
+
         self.reconstruction_loss_fn = nn.L1Loss()
 
         self.perceptive_loss_fn = PerceptiveLoss(
@@ -62,7 +68,7 @@ class IAFLoss(nn.Module):
 
         total_loss += (self.kl_loss_weight * kl_loss)
         return total_loss, recon_loss, perceptive_loss, kl_loss
-    
+
 
 class VAEFTLoss(VAELoss):
     def __init__(self, *args, **kwargs):
@@ -80,6 +86,16 @@ class VAEFTLoss(VAELoss):
 
 
 class PerceptiveLoss(nn.Module):
+    """
+    Perceptive loss as introduced by:
+    https://arxiv.org/abs/1610.00291v2
+
+
+    We used a ImageNet-1k pretrained ResNet-18 as the feature extractor, and the L1 distance for the loss.
+
+    This is different from the original paper, where they used a VGG-19 model, but we found that
+    using a more recent ResNet model gave better results.
+    """
     def __init__(
             self,
             model_type: str,
@@ -96,8 +112,8 @@ class PerceptiveLoss(nn.Module):
         for param in self.model.parameters():
             param.requires_grad = False
 
-        self.model.compile(mode='max-autotune')
-        
+        self.model.compile(mode='max-autotune') # TODO guard this with a config parameter
+
         self.layers_weights = layers_weights
 
         self.dist_fn = nn.L1Loss()
