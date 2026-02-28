@@ -17,3 +17,44 @@ This is a re-implementation of the full Stable Diffusion 3 pipeline on the Plant
 - MM-DiT training on the annotated dataset (optional use of pre-computed latents).
 - Gradio demo for image generation.
 
+## Usage
+
+First, you need to clone the repository:
+```bash
+git clone
+```
+
+Then, you can run the different stages of the pipeline by using different configuration files.
+
+To train the VAE, use:
+```bash
+python -m src.plantgen config/vae/vae_training_config.yaml
+```
+
+To pre-compute the latents, use:
+```bash
+python -m src.plantgen.scripts.encode_dataset <config_path> <save_path> [image_size] [batch_size]
+```
+
+To annotate the dataset, use:
+```bash
+python -m src.plantgen.scripts.annotate_dataset
+```
+
+To train the diffusion model, use:
+```bash
+python -m src.plantgen config/flowmatching/flowmatching_training_config.yaml
+```
+
+Alternatively, if you have pre-computed latents, you can use:
+```bash
+python -m src.plantgen config/flowmatching/flowmatching_training_config_precomp.yaml
+```
+Make sure to adjust the config according to where you saved the latents.
+
+The default provided configs are set to the settings used for the final models training.
+
+Finally, to run the demo, use:
+```bash
+python -m src.plantgen config/demo/demo_config.yaml
+```
